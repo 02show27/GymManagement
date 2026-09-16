@@ -1,0 +1,141 @@
+@model GymManagement.Presentation.Web.Models.HomeDashboardViewModel
+@{
+    ViewData["Title"] = "Panel de Control Operativo";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0">Panel de Control General</h2>
+        <p class="text-muted">Estado operativo de membresías, reservas y clases grupales en tiempo real</p>
+    </div>
+    <div>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary me-2"><i class="bi bi-house-door"></i> Vista Pública</a>
+        <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nueva Reserva</button>
+    </div>
+</div>
+
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 bg-primary bg-opacity-10 text-primary p-3 rounded-3">
+                        <i class="bi bi-people-fill fs-3"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Socios Activos</h6>
+                        <h3 class="fw-bold mb-0">@Model.TotalSociosActivos</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 bg-success bg-opacity-10 text-success p-3 rounded-3">
+                        <i class="bi bi-calendar-check fs-3"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Clases del dia</h6>
+                        <h3 class="fw-bold mb-0">@Model.ClasesProgramadasHoy</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 bg-info bg-opacity-10 text-info p-3 rounded-3">
+                        <i class="bi bi-ticket-perforated-fill fs-3"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Reservas del Mes</h6>
+                        <h3 class="fw-bold mb-0">@Model.ReservasConfirmadasMes</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 bg-warning bg-opacity-10 text-warning p-3 rounded-3">
+                        <i class="bi bi-pie-chart-fill fs-3"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Ocupación Promedio</h6>
+                        <h3 class="fw-bold mb-0">@Model.OcupacionPromedioPorcentaje%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header bg-white py-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Clases Grupales Programadas para Hoy</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Clase / Disciplina</th>
+                        <th>Instructor</th>
+                        <th>Horario</th>
+                        <th>Reservas / Inscriptos</th>
+                        <th>Lista de Espera </th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var clase in Model.ProximasClases)
+                    {
+                        var porcentaje = (double)clase.InscritosConfirmados / clase.CupoMaximo * 100;
+                        <tr>
+                            <td><strong class="text-dark">@clase.NombreClase</strong></td>
+                            <td>@clase.Instructor</td>
+                            <td>@clase.FechaHora.ToString("HH:mm") hs</td>
+                            <td style="min-width: 180px;">
+                                <div class="d-flex justify-content-between mb-1 small">
+                                    <span>@clase.InscritosConfirmados / @clase.CupoMaximo</span>
+                                    <span>@Math.Round(porcentaje)%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar @(porcentaje >= 100 ? "bg-danger" : "bg-primary")" role="progressbar" style="width: @porcentaje%"></div>
+                                </div>
+                            </td>
+                            <td>
+                                @if (clase.EnListaEspera > 0)
+                                {
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> @clase.EnListaEspera en espera</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Sin espera</span>
+                                }
+                            </td>
+                            <td>
+                                @if (clase.InscritosConfirmados >= clase.CupoMaximo)
+                                {
+                                    <span class="badge bg-danger">Completo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Cupos Disponibles</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
