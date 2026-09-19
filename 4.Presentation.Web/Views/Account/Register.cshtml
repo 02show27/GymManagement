@@ -1,0 +1,141 @@
+@model GymManagement.Presentation.Web.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Registro de Cliente";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GymManagement</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='110' fill='%231e1e2f'/><path d='M256 70 L370 120 V250 C370 335 320 405 256 440 C192 405 142 335 142 250 V120 L256 70 Z' fill='none' stroke='%2300f2c3' stroke-width='20'/><path d='M130 256 H190 L215 200 L245 310 L275 180 L305 280 L325 256 H382' fill='none' stroke='%23e14eca' stroke-width='20' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e1e2f 0%, #0f0c20 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 2rem 0;
+        }
+        .card-register {
+            background: #27293d;
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+        }
+        .form-control {
+            background-color: #1e1e2e;
+            border: 1px solid #2b2b40;
+            color: #ffffff;
+        }
+        .form-control:focus {
+            background-color: #1e1e2e;
+            border-color: #00f2c3;
+            color: #ffffff;
+            box-shadow: 0 0 0 0.25rem rgba(0, 242, 195, 0.25);
+        }
+        .btn-success-custom {
+            background: linear-gradient(to right, #00f2c3, #0072ff);
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            padding: 0.75rem;
+        }
+        .btn-success-custom:hover {
+            opacity: 0.9;
+        }
+        .brand-logo {
+            font-size: 2.5rem;
+            color: #00f2c3;
+        }
+        .btn-exit {
+            color: #a1a1b5;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+        }
+        .btn-exit:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="card card-register p-4">
+        <!-- Botón Salir / Volver al Inicio -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <a asp-controller="Home" asp-action="Index" class="btn-exit fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i> Salir al Inicio
+            </a>
+        </div>
+
+        <div class="text-center mb-3">
+            <i class="bi bi-person-plus brand-logo"></i>
+            <h3 class="fw-bold mt-2">Crear Cuenta de Socio</h3>
+            <p class="text-muted small">Regístrate para comenzar a reservar tus clases</p>
+        </div>
+
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+            <div class="mb-3">
+                <label asp-for="NombreCompleto" class="form-label small text-uppercase fw-semibold"></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-light"><i class="bi bi-person"></i></span>
+                    <input asp-for="NombreCompleto" class="form-control" placeholder="Juan Pérez" />
+                </div>
+                <span asp-validation-for="NombreCompleto" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label small text-uppercase fw-semibold"></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-light"><i class="bi bi-envelope"></i></span>
+                    <input asp-for="Email" class="form-control" placeholder="correo@ejemplo.com" />
+                </div>
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Telefono" class="form-label small text-uppercase fw-semibold"></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-light"><i class="bi bi-telephone"></i></span>
+                    <input asp-for="Telefono" class="form-control" placeholder="+591 70000000" />
+                </div>
+                <span asp-validation-for="Telefono" class="text-danger small"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Password" class="form-label small text-uppercase fw-semibold"></label>
+                    <input asp-for="Password" class="form-control" placeholder="••••••••" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ConfirmPassword" class="form-label small text-uppercase fw-semibold"></label>
+                    <input asp-for="ConfirmPassword" class="form-control" placeholder="••••••••" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success-custom w-100 text-white mb-3 mt-2">
+                <i class="bi bi-check-circle me-1"></i> Registrarme Ahora
+            </button>
+        </form>
+
+        <div class="text-center border-top border-secondary pt-3 mt-2">
+            <p class="small text-muted mb-0">¿Ya tienes una cuenta registrada?</p>
+            <a asp-action="Login" class="small text-info text-decoration-none fw-semibold">Inicia sesión aquí</a>
+        </div>
+    </div>
+</body>
+</html>

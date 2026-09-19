@@ -1,0 +1,337 @@
+@model GymManagement.Application.DTOs.ClienteDashboardViewModel
+@{
+    ViewData["Title"] = "Panel de Cliente - Mi Cuenta";
+}
+
+<div class="container py-4">
+    <!-- Alertas -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show shadow-sm mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["WarningMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
+            <i class="bi bi-x-circle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Encabezado de Perfil con Acciones (Editar Perfil / Cerrar Sesión) -->
+    <div class="card border-0 shadow-sm p-4 mb-4 bg-dark text-white rounded-3">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+            <div class="d-flex align-items-center mb-3 mb-md-0">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 55px; height: 55px; font-size: 1.5rem; font-weight: bold;">
+                    @(string.IsNullOrEmpty(Model.NombreSocio) ? "S" : Model.NombreSocio.Substring(0, 1))
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-0">@Model.NombreSocio</h3>
+                    <p class="text-light opacity-75 small mb-0"><i class="bi bi-envelope"></i> @Model.EmailSocio</p>
+                </div>
+            </div>
+            
+            <div class="d-flex flex-column flex-sm-row align-items-md-center gap-2 text-md-end">
+                <div class="me-md-3">
+                    <span class="badge bg-success fs-6 px-3 py-2">Membresía @Model.EstadoMembresia</span>
+                    <p class="small text-light opacity-75 mt-1 mb-0">Plan: <strong>@Model.TipoPlan</strong></p>
+                </div>
+                
+                <div class="d-flex gap-2 mt-2 mt-sm-0">
+                    <!-- Botón Editar Perfil -->
+                    <button type="button" class="btn btn-outline-light btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
+                        <i class="bi bi-pencil-square"></i> Editar Perfil
+                    </button>
+
+                    <!-- Botón Cerrar Sesión -->
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm fw-semibold">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Perfil -->
+    <div class="modal fade" id="modalEditarPerfil" tabindex="-1" aria-labelledby="modalEditarPerfilLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold" id="modalEditarPerfilLabel"><i class="bi bi-person-gear"></i> Editar Datos de Perfil</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="ActualizarPerfil" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nombre Completo</label>
+                            <input type="text" name="nombreCompleto" class="form-control" value="@Model.NombreSocio" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Correo Electrónico</label>
+                            <input type="email" class="form-control" value="@Model.EmailSocio" disabled />
+                            <small class="text-muted">El correo electrónico no se puede modificar.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary btn-sm fw-bold">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegación por Pestañas (Tabs) -->
+    <ul class="nav nav-pills mb-4 nav-fill bg-light p-2 rounded shadow-sm" id="clientTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="resumen-tab" data-bs-toggle="tab" data-bs-target="#resumen" type="button" role="tab">
+                <i class="bi bi-speedometer2"></i> Vista General
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="reservas-tab" data-bs-toggle="tab" data-bs-target="#reservas" type="button" role="tab">
+                <i class="bi bi-qr-code"></i> Mis Reservas & Pases (@Model.ReservasActivasCount)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="clases-tab" data-bs-toggle="tab" data-bs-target="#clases" type="button" role="tab">
+                <i class="bi bi-calendar3"></i> Oferta de Clases
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="pagos-tab" data-bs-toggle="tab" data-bs-target="#pagos" type="button" role="tab">
+                <i class="bi bi-credit-card-2-front"></i> Mis Pagos & Membresía
+            </button>
+        </li>
+    </ul>
+
+    <!-- Contenido de las Pestañas -->
+    <div class="tab-content" id="clientTabsContent">
+        
+        <!-- PESTAÑA 1: VISTA GENERAL -->
+        <div class="tab-pane fade show active" id="resumen" role="tabpanel">
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm bg-primary text-white p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase mb-1 small fw-bold">Clases Asistidas (Mes)</h6>
+                                <h2 class="fw-bold mb-0">@Model.ClasesAsistidasMes</h2>
+                            </div>
+                            <i class="bi bi-check-circle fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm bg-dark text-white p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase mb-1 small fw-bold">Reservas Activas</h6>
+                                <h2 class="fw-bold mb-0">@Model.ReservasActivasCount</h2>
+                            </div>
+                            <i class="bi bi-calendar-event fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm bg-success text-white p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase mb-1 small fw-bold">Renovación</h6>
+                                <h2 class="fw-bold mb-0">@Model.FechaVencimientoMembresia?.ToString("dd/MM")</h2>
+                            </div>
+                            <i class="bi bi-arrow-repeat fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Próxima Clase Reservada Destacada -->
+            <div class="card border-0 shadow-sm p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-clock-history text-primary"></i> Tu Próxima Clase Grupal</h5>
+                @if (Model.MisReservas.Any(r => r.EstadoReserva == "CONFIRMADA"))
+                {
+                    var proxima = Model.MisReservas.First(r => r.EstadoReserva == "CONFIRMADA");
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between bg-light p-3 rounded">
+                        <div>
+                            <span class="badge bg-success mb-2">CONFIRMADA</span>
+                            <h4 class="fw-bold mb-1">@proxima.NombreClase</h4>
+                            <p class="text-muted mb-1"><i class="bi bi-person"></i> Instructor: @proxima.Instructor</p>
+                            <p class="text-primary fw-bold mb-0"><i class="bi bi-calendar-check"></i> @proxima.FechaHora.ToString("dd/MM/yyyy HH:mm")</p>
+                        </div>
+                        @if (!string.IsNullOrEmpty(proxima.QrCodeBase64))
+                        {
+                            <div class="text-center mt-3 mt-md-0">
+                                <img src="@proxima.QrCodeBase64" class="img-fluid rounded border p-1" style="max-width: 100px;" />
+                                <span class="d-block text-muted mt-1" style="font-size: 0.7rem;">Pase de Check-in</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No tienes clases confirmadas en las próximas horas. ¡Consulta la pestaña de oferta para reservar!</p>
+                }
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: MIS RESERVAS & PASES QR -->
+        <div class="tab-pane fade" id="reservas" role="tabpanel">
+            <h4 class="fw-bold mb-3">Tus Reservas y Pases Digitales</h4>
+            <div class="row g-3">
+                @if (!Model.MisReservas.Any())
+                {
+                    <div class="col-12"><p class="text-muted">No tienes reservas activas en este momento.</p></div>
+                }
+                else
+                {
+                    @foreach (var res in Model.MisReservas)
+                    {
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <span class="badge @(res.EstadoReserva == "CONFIRMADA" ? "bg-success" : "bg-warning text-dark") mb-2">
+                                            @res.EstadoReserva @(res.PosicionListaEspera.HasValue ? $"#{res.PosicionListaEspera}" : "")
+                                        </span>
+                                        <h5 class="fw-bold mb-1">@res.NombreClase</h5>
+                                        <p class="text-muted small mb-1"><i class="bi bi-person"></i> Inst: @res.Instructor</p>
+                                        <p class="text-primary fw-semibold small mb-2"><i class="bi bi-clock"></i> @res.FechaHora.ToString("dd/MM/yyyy HH:mm")</p>
+
+                                        <form asp-action="Cancelar" method="post" onsubmit="return confirm('¿Deseas cancelar esta reserva?');">
+                                            <input type="hidden" name="reservaId" value="@res.ReservaId" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-x-circle"></i> Cancelar Reserva
+                                            </button>
+                                        </form>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(res.QrCodeBase64))
+                                    {
+                                        <div class="text-center ms-3">
+                                            <img src="@res.QrCodeBase64" alt="Pase QR" class="img-fluid rounded border p-1" style="max-width: 110px;" />
+                                            <span class="d-block text-muted mt-1" style="font-size: 0.7rem;">Pase de Entrada</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- PESTAÑA 3: CATÁLOGO DE CLASES GRUPALES -->
+        <div class="tab-pane fade" id="clases" role="tabpanel">
+            <h4 class="fw-bold mb-3">Grilla de Clases Disponibles</h4>
+            <div class="row g-4">
+                @foreach (var clase in Model.ClasesDisponibles)
+                {
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="fw-bold text-dark mb-0">@clase.NombreDisciplina</h5>
+                                    <span class="badge @(clase.EstaLleno ? "bg-danger" : "bg-primary")">
+                                        @(clase.EstaLleno ? "Aforo Completo" : $"{clase.CuposDisponibles} Cupos")
+                                    </span>
+                                </div>
+                                <p class="text-muted small mb-2"><i class="bi bi-person-badge"></i> Instructor: @clase.Instructor</p>
+                                <p class="text-dark small mb-3"><i class="bi bi-clock"></i> @clase.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</p>
+
+                                <div class="progress mb-3" style="height: 8px;">
+                                    <div class="progress-bar @(clase.EstaLleno ? "bg-danger" : "bg-success")" 
+                                         role="progressbar" 
+                                         style="width: @((clase.CuposOcupados * 100) / clase.CupoMaximo)%;"></div>
+                                </div>
+                                <span class="d-block text-end text-muted small mb-3">@clase.CuposOcupados / @clase.CupoMaximo Inscritos</span>
+
+                                <form asp-action="Reservar" method="post">
+                                    <input type="hidden" name="horarioClaseId" value="@clase.HorarioClaseId" />
+                                    @if (clase.EstaLleno)
+                                    {
+                                        <button type="submit" class="btn btn-warning text-dark fw-bold w-100">
+                                            Unirse a Lista de Espera (FIFO)
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn btn-primary fw-bold w-100">
+                                            Reservar Cupo
+                                        </button>
+                                    }
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- PESTAÑA 4: MIS PAGOS & MEMBRESÍA -->
+        <div class="tab-pane fade" id="pagos" role="tabpanel">
+            <div class="row g-4">
+                <!-- Detalle del Plan Activo -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-4 h-100">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-card-checklist text-primary"></i> Plan Actual</h5>
+                        <h3 class="fw-bold text-success mb-1">@Model.TipoPlan</h3>
+                        <p class="text-muted small">Estatus: <span class="badge bg-success">@Model.EstadoMembresia</span></p>
+                        <hr />
+                        <ul class="list-unstyled small text-muted mb-4">
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-1"></i> Precio: <strong>@Model.PrecioPlan.ToString("0.00") Bs / mes</strong></li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-1"></i> Activación: @Model.FechaInicioMembresia?.ToString("dd/MM/yyyy")</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-1"></i> Próximo cobro: @Model.FechaVencimientoMembresia?.ToString("dd/MM/yyyy")</li>
+                        </ul>
+                        <button class="btn btn-outline-primary w-100 fw-bold">
+                            <i class="bi bi-arrow-repeat"></i> Cambiar Plan / Suscripción
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Historial de Facturación -->
+                <div class="col-md-8">
+                    <div class="card border-0 shadow-sm p-4 h-100">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-receipt text-primary"></i> Historial de Transacciones</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Concepto</th>
+                                        <th>Método</th>
+                                        <th>Monto</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var pago in Model.HistorialPagos)
+                                    {
+                                        <tr>
+                                            <td class="small">@pago.FechaPago.ToString("dd/MM/yyyy")</td>
+                                            <td class="fw-bold">@pago.Concepto</td>
+                                            <td class="small text-muted">@pago.MetodoPago</td>
+                                            <td class="fw-bold text-success">@pago.Monto.ToString("0.00") Bs</td>
+                                            <td><span class="badge bg-success">@pago.Estado</span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

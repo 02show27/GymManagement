@@ -1,18 +1,19 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using GymManagement.Presentation.Web.Models;
 
 namespace GymManagement.Presentation.Web.Controllers;
-
+[AllowAnonymous]
 public class HomeController : Controller
 {
-  
+    // GET: / (Página principal pública de inicio)
     public IActionResult Index()
     {
         return View();
     }
 
-   
+    // GET: /Home/Dashboard (Dashboard público / métricas generales)
     public IActionResult Dashboard()
     {
         var model = new HomeDashboardViewModel

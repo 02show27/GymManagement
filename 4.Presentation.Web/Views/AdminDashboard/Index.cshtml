@@ -1,0 +1,285 @@
+@model GymManagement.Application.DTOs.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Panel Ejecutivo de Administración";
+}
+
+<div class="container py-4">
+    <!-- Alertas -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
+            <i class="bi bi-x-circle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Encabezado de Administración -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h2 class="fw-bold"><i class="bi bi-gear-fill text-primary"></i> Panel de Control Ejecutivo</h2>
+            <p class="text-muted mb-0">Parametrización de aforos, métricas en tiempo real e informes financieros.</p>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <a asp-action="DescargarReportePdf" class="btn btn-danger fw-bold shadow-sm">
+                <i class="bi bi-file-earmark-pdf-fill"></i> Descargar Reporte Financiero PDF
+            </a>
+            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-danger fw-bold">
+                    <i class="bi bi-box-arrow-right"></i> Salir
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tarjetas de Métricas -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-primary text-white p-3">
+                <h6 class="text-uppercase mb-1 small fw-bold">Socios Totales</h6>
+                <h2 class="fw-bold mb-0">@Model.TotalSociosActivos</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-success text-white p-3">
+                <h6 class="text-uppercase mb-1 small fw-bold">Ingresos Estimados</h6>
+                <h2 class="fw-bold mb-0">@Model.IngresosTotalesMes.ToString("0.00") Bs</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-dark text-white p-3">
+                <h6 class="text-uppercase mb-1 small fw-bold">Reservas del Mes</h6>
+                <h2 class="fw-bold mb-0">@Model.ReservasConfirmadasMes</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-info text-white p-3">
+                <h6 class="text-uppercase mb-1 small fw-bold">Ocupación Promedio</h6>
+                <h2 class="fw-bold mb-0">@Model.OcupacionPromedioPorcentaje%</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pestañas del Administrador -->
+    <ul class="nav nav-pills mb-4 nav-fill bg-light p-2 rounded shadow-sm" id="adminTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active fw-bold" id="clases-tab" data-bs-toggle="tab" data-bs-target="#clases" type="button">
+                <i class="bi bi-journal-plus"></i> Clases & Aforos
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold" id="socios-tab" data-bs-toggle="tab" data-bs-target="#socios" type="button">
+                <i class="bi bi-people-fill"></i> Socios & Membresías
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold" id="pagos-tab" data-bs-toggle="tab" data-bs-target="#pagos" type="button">
+                <i class="bi bi-cash-stack"></i> Gestión de Pagos
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold" id="quejas-tab" data-bs-toggle="tab" data-bs-target="#quejas" type="button">
+                <i class="bi bi-chat-square-dots-fill"></i> Quejas & Sugerencias
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabsContent">
+        
+        <!-- PESTAÑA 1: GESTIÓN DE CLASES & AFOROS -->
+        <div class="tab-pane fade show active" id="clases" role="tabpanel">
+            <div class="row g-4 mb-4">
+                <div class="col-md-5">
+                    <div class="card border-0 shadow-sm p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle text-primary"></i> Registrar Nueva Disciplina</h5>
+                        <form asp-action="CrearClase" method="post">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Nombre de la Clase</label>
+                                <input type="text" name="nombre" class="form-control" placeholder="Ej. Pilates Reformer" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Descripción</label>
+                                <textarea name="descripcion" class="form-control" rows="2" placeholder="Detalles de la sesión..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Duración (Minutos)</label>
+                                <input type="number" name="duracionMinutos" class="form-control" value="60" required />
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 fw-bold">Guardar Disciplina</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <div class="card border-0 shadow-sm p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-calendar-plus text-primary"></i> Programar Horario & Aforo Estricto N</h5>
+                        <form asp-action="ProgramarHorario" method="post">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Seleccionar Disciplina</label>
+                                    <select name="claseId" class="form-select" required>
+                                        @foreach (var c in Model.Clases)
+                                        {
+                                            <option value="@c.Id">@c.Nombre (@c.DuracionMinutos min)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Instructor Asignado</label>
+                                    <input type="text" name="instructor" class="form-control" placeholder="Nombre del Instructor" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Fecha y Hora de Inicio</label>
+                                    <input type="datetime-local" name="fechaHoraInicio" class="form-control" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Aforo Máximo N (Cupo)</label>
+                                    <input type="number" name="cupoMaximo" class="form-control" value="15" min="1" required />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 fw-bold mt-3">Programar Clase</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4">
+                <h5 class="fw-bold mb-3">Grilla de Horarios Programados y Ocupación</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Clase</th>
+                                <th>Instructor</th>
+                                <th>Fecha / Hora</th>
+                                <th>Aforo N</th>
+                                <th>Ocupación %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var h in Model.Horarios)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@h.NombreClase</td>
+                                    <td>@h.Instructor</td>
+                                    <td>@h.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td><span class="badge bg-secondary">@h.CuposOcupados / @h.CupoMaximo</span></td>
+                                    <td>
+                                        <div class="progress" style="height: 15px;">
+                                            <div class="progress-bar @(h.PorcentajeOcupacion >= 100 ? "bg-danger" : "bg-primary")" role="progressbar" style="width: @h.PorcentajeOcupacion%;">
+                                                @h.PorcentajeOcupacion.ToString("0")%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: SOCIOS & MEMBRESÍAS -->
+        <div class="tab-pane fade" id="socios" role="tabpanel">
+            <div class="card border-0 shadow-sm p-4">
+                <h5 class="fw-bold mb-3">Listado Centralizado de Socios</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Registro</th>
+                                <th>Estado Membresía</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in Model.Socios)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@s.Nombre</td>
+                                    <td>@s.Email</td>
+                                    <td>@s.Telefono</td>
+                                    <td>@s.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                                    <td><span class="badge bg-success">@s.EstadoMembresia</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 3: GESTIÓN DE PAGOS -->
+        <div class="tab-pane fade" id="pagos" role="tabpanel">
+            <div class="card border-0 shadow-sm p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-cash-card text-success"></i> Registro de Pagos e Ingresos</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Socio</th>
+                                <th>Concepto</th>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in Model.Pagos)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@p.SocioNombre</td>
+                                    <td>@p.Concepto</td>
+                                    <td>@p.FechaPago.ToString("dd/MM/yyyy")</td>
+                                    <td class="fw-bold text-success">@p.Monto.ToString("0.00") Bs</td>
+                                    <td><span class="badge bg-success">@p.Estado</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 4: BUZÓN DE QUEJAS Y SUGERENCIAS -->
+        <div class="tab-pane fade" id="quejas" role="tabpanel">
+            <div class="card border-0 shadow-sm p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-chat-left-text text-warning"></i> Buzón de Atención al Cliente</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Socio</th>
+                                <th>Asunto</th>
+                                <th>Mensaje</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var q in Model.Quejas)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@q.SocioNombre</td>
+                                    <td>@q.Asunto</td>
+                                    <td class="small text-muted">@q.Mensaje</td>
+                                    <td class="small">@q.FechaEnvio.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td><span class="badge bg-warning text-dark">@q.Estado</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
