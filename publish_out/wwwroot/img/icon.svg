@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Fondo con Gradiente Oscuro -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1e2f" />
+      <stop offset="100%" stop-color="#0f0c20" />
+    </linearGradient>
+
+    <!-- Gradiente Neón Primario (Turquesa a Azul) -->
+    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2c3" />
+      <stop offset="100%" stop-color="#0072ff" />
+    </linearGradient>
+
+    <!-- Gradiente Neón Secundario (Magenta a Morado) -->
+    <linearGradient id="neonMagenta" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e14eca" />
+      <stop offset="100%" stop-color="#ba54ec" />
+    </linearGradient>
+
+    <!-- Sombra Suave -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#00f2c3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Base Contenedora (Rounded Square) -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)"/>
+
+  <!-- Borde Interno Elegante -->
+  <rect x="20" y="20" width="472" height="472" rx="90" fill="none" stroke="url(#neonCyan)" stroke-width="6" opacity="0.4"/>
+
+  <!-- Grupo Principal con Sombra -->
+  <g filter="url(#glow)">
+    <!-- Escudo / Silueta de Fondo -->
+    <path d="M256 70 L370 120 V250 C370 335 320 405 256 440 C192 405 142 335 142 250 V120 L256 70 Z" 
+          fill="none" 
+          stroke="url(#neonCyan)" 
+          stroke-width="14" 
+          stroke-linejoin="round"/>
+
+    <!-- Mancuerna / Pesa Estilizada -->
+    <g fill="url(#neonMagenta)">
+      <!-- Discos Izquierdos -->
+      <rect x="180" y="220" width="16" height="72" rx="6"/>
+      <rect x="200" y="200" width="20" height="112" rx="8"/>
+      
+      <!-- Discos Derechom -->
+      <rect x="292" y="200" width="20" height="112" rx="8"/>
+      <rect x="316" y="220" width="16" height="72" rx="6"/>
+
+      <!-- Barra Central -->
+      <rect x="210" y="244" width="92" height="24" rx="4"/>
+    </g>
+
+    <!-- Pulso / Línea de Ritmo Cardíaco (Vitalidad) -->
+    <path d="M120 256 H190 L215 200 L245 310 L275 180 L305 280 L325 256 H392" 
+          fill="none" 
+          stroke="#ffffff" 
+          stroke-width="12" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+  </g>
+</svg>
